@@ -17,7 +17,7 @@ the revoke/un-revoke lifecycle across `VFIO_DEVICE_RESET`:
 
 Build:
 
-    gcc -O2 -Wall -Wextra -o vfio_dmabuf_reset vfio_dmabuf_reset.c -libverbs
+    make
 
 Run:
 
