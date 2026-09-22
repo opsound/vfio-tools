@@ -13,21 +13,6 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#ifndef VFIO_DEVICE_FEATURE_DMA_BUF
-#define VFIO_DEVICE_FEATURE_DMA_BUF 11
-struct vfio_region_dma_range {
-	uint64_t offset;
-	uint64_t length;
-};
-struct vfio_device_feature_dma_buf {
-	uint32_t region_index;
-	uint32_t open_flags;
-	uint32_t flags;
-	uint32_t nr_ranges;
-	struct vfio_region_dma_range dma_ranges[];
-};
-#endif
-
 #define DMABUF_LEN (2u * 1024u * 1024u)
 #define VFIO_CDEV_PREFIX "/dev/vfio/devices/"
 
