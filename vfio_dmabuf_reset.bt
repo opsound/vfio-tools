@@ -1,0 +1,166 @@
+#!/usr/bin/env bpftrace
+// usage: sudo bpftrace vfio_dmabuf_reset.bt, then run ./vfio_dmabuf_reset BDF IB_DEV
+BEGIN
+{
+  printf("%-9s %-36s %s\n", "TIME(ms)", "EVENT", "DETAIL");
+}
+
+kretprobe:vfio_pci_core_feature_dma_buf
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s fd=%d\n", elapsed / 1000000, "vfio_pci_core_feature_dma_buf:ret", retval);
+}
+
+kprobe:mlx5_ib_reg_user_mr_dmabuf
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s fd=%d\n", elapsed / 1000000, "mlx5_ib_reg_user_mr_dmabuf", arg4);
+}
+
+kretprobe:mlx5_ib_reg_user_mr_dmabuf
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s mr=0x%llx\n", elapsed / 1000000, "mlx5_ib_reg_user_mr_dmabuf:ret", retval);
+}
+
+kretprobe:dma_buf_dynamic_attach
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "dma_buf_dynamic_attach:ret", retval);
+}
+
+kprobe:vfio_pci_dma_buf_attach
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s dmabuf=0x%llx att=0x%llx\n", elapsed / 1000000, "vfio_pci_dma_buf_attach", arg0, arg1);
+}
+
+kretprobe:vfio_pci_dma_buf_attach
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s ret=%d\n", elapsed / 1000000, "vfio_pci_dma_buf_attach:ret", retval);
+}
+
+kprobe:ib_umem_dmabuf_map_pages
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s umem=0x%llx\n", elapsed / 1000000, "ib_umem_dmabuf_map_pages", arg0);
+}
+
+kretprobe:ib_umem_dmabuf_map_pages
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s ret=%d\n", elapsed / 1000000, "ib_umem_dmabuf_map_pages:ret", retval);
+}
+
+kprobe:dma_buf_map_attachment
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "dma_buf_map_attachment", arg0);
+}
+
+kprobe:vfio_pci_dma_buf_map
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "vfio_pci_dma_buf_map", arg0);
+}
+
+kretprobe:vfio_pci_dma_buf_map
+/comm == "vfio_dmabuf_res"/
+{
+  if (retval > 0xfffffffffffff000) {
+    printf("%-9d %-36s err=%d\n", elapsed / 1000000, "vfio_pci_dma_buf_map:ret", retval);
+  } else {
+    printf("%-9d %-36s sgt=0x%llx\n", elapsed / 1000000, "vfio_pci_dma_buf_map:ret", retval);
+  }
+}
+
+kprobe:dma_buf_invalidate_mappings
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s dmabuf=0x%llx\n", elapsed / 1000000, "dma_buf_invalidate_mappings", arg0);
+}
+
+kprobe:vfio_pci_dma_buf_move
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s revoked=%d\n", elapsed / 1000000, "vfio_pci_dma_buf_move", arg1);
+}
+
+kprobe:pci_try_reset_function
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s\n", elapsed / 1000000, "pci_try_reset_function");
+}
+
+kretprobe:pci_try_reset_function
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s ret=%d\n", elapsed / 1000000, "pci_try_reset_function:ret", retval);
+}
+
+kprobe:mlx5_ib_dmabuf_invalidate_cb
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "mlx5_ib_dmabuf_invalidate_cb", arg0);
+}
+
+kprobe:ib_umem_dmabuf_unmap_pages
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s umem=0x%llx\n", elapsed / 1000000, "ib_umem_dmabuf_unmap_pages", arg0);
+}
+
+kprobe:dma_buf_unmap_attachment
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "dma_buf_unmap_attachment", arg0);
+}
+
+kprobe:vfio_pci_dma_buf_unmap
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "vfio_pci_dma_buf_unmap", arg0);
+}
+
+kprobe:mlx5_ib_advise_mr_prefetch
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s advice=%d flags=%d\n", elapsed / 1000000, "mlx5_ib_advise_mr_prefetch", arg1, arg2);
+}
+
+kretprobe:mlx5_ib_advise_mr_prefetch
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s ret=%d\n", elapsed / 1000000, "mlx5_ib_advise_mr_prefetch:ret", retval);
+}
+
+kprobe:pagefault_dmabuf_mr
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s mr=0x%llx\n", elapsed / 1000000, "pagefault_dmabuf_mr", arg0);
+}
+
+kretprobe:pagefault_dmabuf_mr
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s ret=%d\n", elapsed / 1000000, "pagefault_dmabuf_mr:ret", retval);
+}
+
+kprobe:vfio_pci_dma_buf_cleanup
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s\n", elapsed / 1000000, "vfio_pci_dma_buf_cleanup");
+}
+
+kprobe:dma_buf_detach
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s att=0x%llx\n", elapsed / 1000000, "dma_buf_detach", arg1);
+}
+
+kprobe:vfio_pci_dma_buf_release
+/comm == "vfio_dmabuf_res"/
+{
+  printf("%-9d %-36s dmabuf=0x%llx\n", elapsed / 1000000, "vfio_pci_dma_buf_release", arg0);
+}
