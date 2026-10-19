@@ -1,10 +1,16 @@
 CC = gcc
 CFLAGS = -O2 -Wall -Wextra
-LDLIBS = -libverbs
 
+all: vfio_dmabuf_reset vfio_bar_bench
+
+vfio_dmabuf_reset: LDLIBS = -libverbs
 vfio_dmabuf_reset: vfio_dmabuf_reset.c
 
-clean:
-	rm -f vfio_dmabuf_reset
+vfio_bar_bench: CFLAGS += -std=gnu11
+vfio_bar_bench: LDLIBS = -lpthread -lm
+vfio_bar_bench: vfio_bar_bench.c
 
-.PHONY: clean
+clean:
+	rm -f vfio_dmabuf_reset vfio_bar_bench
+
+.PHONY: all clean
